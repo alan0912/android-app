@@ -1,10 +1,12 @@
 package com.example.myapplication;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -32,12 +34,15 @@ public class MainActivity extends AppCompatActivity {
     EditText inputbox;
     Button send_bt;
     String tmp;
-    Channel channel ;
+    Channel channel;
+    LinearLayout linearLayout;
+
     RecyclerView recyclerView;
     List<Msg> msgList = new ArrayList<>();
     MsgAdapter adapter;
-    InputMethodManager mInputMethodManager;
     int type;
+
+    InputMethodManager mInputMethodManager;
     char separato = 127;
 
     @Override
@@ -50,18 +55,16 @@ public class MainActivity extends AppCompatActivity {
 
         mInputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
 
-        //recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        chatbox = (TextView) findViewById(R.id.chatbox);
-        inputbox = (EditText)findViewById(R.id.inputbox);
-        send_bt = (Button)findViewById(R.id.send_bt);
+        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        inputbox = (EditText) findViewById(R.id.inputbox);
+        send_bt = (Button) findViewById(R.id.send_bt);
 
-        /*
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         adapter = new MsgAdapter(msgList);
         recyclerView.setAdapter(adapter);
         type = Msg.TYPE_SENT;
-        */
+
 
         factory = new ConnectionFactory();
         factory.setHost("10.0.2.2");
@@ -72,10 +75,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void Send(View view) {
-        new Thread(()->{
-            try  {
+        new Thread(() -> {
+            try {
                 /*send*/
                 tmp = inputbox.getText().toString();
+                if(tmp.equals(""))return;
                 pack();
                 inputbox.setText("");
                 channel.basicPublish("MyExchange", "", null, tmp.getBytes(StandardCharsets.UTF_8));
@@ -87,32 +91,34 @@ public class MainActivity extends AppCompatActivity {
         }).start();
     }
 
-    public void Recv(){
-        new Thread(()->{
-            try  {
+    public void Recv() {
+        new Thread(() -> {
+            try {
                 Connection connection = factory.newConnection();
                 Channel channel = connection.createChannel();
                 channel.exchangeDeclare("MyExchange", "fanout");
                 String queueName = channel.queueDeclare().getQueue();
                 channel.queueBind(queueName, "MyExchange", "");
 
-                /*recv*/
+                //recv
                 DeliverCallback deliverCallback = (consumerTag, delivery) -> {
+                    Log.d("recv handler", "start");
                     tmp = new String(delivery.getBody(), "UTF-8");
                     unpack();
-                    chatbox.append(tmp + "\n");
                     System.out.println(" [x] Received '" + tmp + "'");
                 };
-                channel.basicConsume(queueName, true, deliverCallback, consumerTag -> { });
-            }catch (IOException  | TimeoutException e){
+                channel.basicConsume(queueName, true, deliverCallback, consumerTag -> {
+                });
+            } catch (IOException | TimeoutException e) {
                 e.printStackTrace();
             }
         }).start();
+
     }
 
-    public void Connect(){
-        new Thread(()->{
-            try  {
+    public void Connect() {
+        new Thread(() -> {
+            try {
                 Connection connection = factory.newConnection();
                 channel = connection.createChannel();
                 channel.exchangeDeclare("MyExchange", "fanout");
@@ -123,39 +129,42 @@ public class MainActivity extends AppCompatActivity {
         }).start();
     }
 
-    public void GetRandomId(){
-        int random_num =(int)(Math.random()* 999999999 + 1);
+    public void GetRandomId() {
+        int random_num = (int) (Math.random() * 999999999 + 1);
         EnterActivity.time = random_num + EnterActivity.time;
     }
 
-    public void pack(){
+    public void pack() {
         String random_time = String.valueOf(EnterActivity.time);
         tmp = random_time + separato + EnterActivity.your_name + separato + tmp;
     }
 
-    public void unpack(){
-        if(tmp.split(separato+"")[0].matches(String.valueOf(EnterActivity.time))){
-            tmp = EnterActivity.your_name + " : " + tmp.split(separato+"")[2];
-            /*
+    public void unpack() {
+        Log.d("unpack handler", "start unpack");
+        if (tmp.split(separato + "")[0].matches(String.valueOf(EnterActivity.time))) {
+            Log.d("unpack handler", "msg from self");
+            //tmp = EnterActivity.your_name + " : " + tmp.split(separato + "")[2];
+
             tmp = tmp.split(separato+"")[2];
             Msg msg = new Msg(tmp,Msg.TYPE_SENT);
             msgList.add(msg);
-            //当有新消息时，刷新RecyclerView中的显示
-            adapter.notifyItemInserted(msgList.size()-1);
-            //将RecyclerView定位到最后一行
-            recyclerView.scrollToPosition(msgList.size() - 1);
-             */
-        }else{
-            tmp = tmp.split(separato+"")[1] + " : " + tmp.split(separato+"")[2];
-            /*
+        } else {
+            Log.d("unpack handler", "msg from others");
+            //tmp = tmp.split(separato + "")[1] + " : " + tmp.split(separato + "")[2];
+
             tmp = tmp.split(separato+"")[2];
             Msg msg = new Msg(tmp,Msg.TYPE_RECEIVED);
             msgList.add(msg);
-            //当有新消息时，刷新RecyclerView中的显示
-            adapter.notifyItemInserted(msgList.size()-1);
-            //将RecyclerView定位到最后一行
-            recyclerView.scrollToPosition(msgList.size() - 1);
-             */
         }
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                adapter.notifyDataSetChanged();
+                adapter.notifyItemInserted(msgList.size()-1);
+                recyclerView.scrollToPosition(msgList.size() - 1);
+            }
+        });
     }
 }
+

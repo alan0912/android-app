@@ -7,27 +7,16 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/chatbox"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:background="#26252a"
-        android:padding="20sp"
-        android:textColor="#FFFFFF"
-        android:textSize="25sp" />
-    <!--
-    <android.support.v7.widget.RecyclerView
-        android:background="#acecae"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:id="@+id/recycler_view"
-        />-->
+        android:background="#26252A" />
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_weight="1"
+        android:layout_height="50dp"
         android:orientation="horizontal">
 
         <EditText
@@ -57,5 +46,7 @@
             android:textSize="18sp" />
 
     </LinearLayout>
+
+
 
 </LinearLayout>

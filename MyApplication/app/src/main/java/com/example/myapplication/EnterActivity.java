@@ -8,6 +8,8 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class EnterActivity extends AppCompatActivity {
@@ -27,6 +29,7 @@ public class EnterActivity extends AppCompatActivity {
 
         name = (EditText)findViewById(R.id.name);
         enter_bt = (Button)findViewById(R.id.enter_bt);
+
     }
 
     public void Enter(View view){
