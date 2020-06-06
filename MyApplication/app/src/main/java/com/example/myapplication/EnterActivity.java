@@ -12,11 +12,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.textfield.TextInputEditText;
+
 public class EnterActivity extends AppCompatActivity {
 
     public static long time;
     public static String your_name;
-    EditText name;
+    TextInputEditText name;
     Button enter_bt;
 
     @Override
@@ -27,7 +29,7 @@ public class EnterActivity extends AppCompatActivity {
         getSupportActionBar().hide();
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
 
-        name = (EditText)findViewById(R.id.name);
+        //name = (TextInputEditText)findViewById(R.id.name);
         enter_bt = (Button)findViewById(R.id.enter_bt);
 
     }

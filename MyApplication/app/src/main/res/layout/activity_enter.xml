@@ -4,22 +4,68 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/chairs"
+    android:backgroundTint="#373636"
+    android:backgroundTintMode="multiply"
+    android:gravity="center"
     android:orientation="vertical"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
     tools:context=".EnterActivity">
 
-    <EditText
-        android:id="@+id/name"
+    <ImageView
+        android:id="@+id/imageView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="Your name"
-        android:inputType="textPersonName" />
+        app:srcCompat="@drawable/title"
+        android:contentDescription="TODO" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:layout_margin="20dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:background="@drawable/dash_line"
+        android:layerType="software" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="請輸入暱稱"
+        android:textColorHint="#aaa"
+        app:boxBackgroundColor="@color/colorPrimaryDark"
+        app:startIconDrawable="@drawable/person_icon"
+        app:startIconTint="#aaa">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#fff"
+            app:counterEnabled="true"
+            app:counterMaxLength="20" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:layout_margin="20dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp" />
 
     <Button
         android:id="@+id/enter_bt"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="Enter"
-        android:text="enter" />
+        android:text="開始聊天"
+        android:textColor="#ffffff"
+        app:backgroundTint="?attr/colorPrimaryDark"
+        app:strokeColor="#fff"
+        app:strokeWidth="5dp"
+        android:paddingLeft="50dp"
+        android:paddingRight="50dp"
+        />
 
 </LinearLayout>
