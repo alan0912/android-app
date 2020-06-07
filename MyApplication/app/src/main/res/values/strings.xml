@@ -1,3 +1,6 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">Let\'s Cheers</string>
+    <string name="input_name_label">暱稱</string>
+    <string name="button_submit_label">開始聊天</string>
+    <string name="please_enter_name">請輸入暱稱</string>
 </resources>

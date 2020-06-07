@@ -18,9 +18,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:srcCompat="@drawable/title"
-        android:contentDescription="TODO" />
+        android:contentDescription="Let's Cheers"
+        tools:ignore="HardcodedText" />
 
-    <View
+    <Space
         android:layout_width="match_parent"
         android:layout_height="5dp"
         android:layout_margin="20dp"
@@ -32,9 +33,11 @@
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="請輸入暱稱"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:hint="@string/input_name_label"
         android:textColorHint="#aaa"
-        app:boxBackgroundColor="@color/colorPrimaryDark"
+        app:boxBackgroundColor="#26252a"
         app:startIconDrawable="@drawable/person_icon"
         app:startIconTint="#aaa">
 
@@ -42,12 +45,13 @@
             android:id="@+id/name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:inputType="text"
             android:textColor="#fff"
             app:counterEnabled="true"
             app:counterMaxLength="20" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <View
+    <Space
         android:layout_width="match_parent"
         android:layout_height="5dp"
         android:layout_margin="20dp"
@@ -59,13 +63,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="Enter"
-        android:text="開始聊天"
-        android:textColor="#ffffff"
-        app:backgroundTint="?attr/colorPrimaryDark"
-        app:strokeColor="#fff"
-        app:strokeWidth="5dp"
         android:paddingLeft="50dp"
         android:paddingRight="50dp"
-        />
+        android:text="@string/button_submit_label"
+        android:textColor="#ffffff"
+        app:backgroundTint="?attr/colorPrimaryDark" />
 
 </LinearLayout>
