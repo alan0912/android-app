@@ -16,7 +16,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="70dp"
         android:orientation="horizontal">
 
         <EditText
@@ -31,19 +31,19 @@
             android:paddingLeft="15sp"
             android:textColor="#979696"
             android:textColorHint="#979696"
+            android:textSize="16dp"
             android:textStyle="bold"
             android:typeface="monospace" />
 
-        <Button
+        <ImageView
             android:id="@+id/send_bt"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="4"
+            android:layout_weight="6"
             android:background="#2c2b30"
             android:onClick="Send"
-            android:text="Send"
-            android:textColor="#979696"
-            android:textSize="18sp" />
+            android:padding="17dp"
+            app:srcCompat="@drawable/paper_plane" />
 
     </LinearLayout>
 

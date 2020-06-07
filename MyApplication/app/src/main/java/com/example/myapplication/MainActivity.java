@@ -4,10 +4,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -30,12 +28,11 @@ import bean.Msg;
 public class MainActivity extends AppCompatActivity {
 
     ConnectionFactory factory;
-    TextView chatbox;
     EditText inputbox;
-    Button send_bt;
+    ImageView send_bt;
     String tmp;
     Channel channel;
-    LinearLayout linearLayout;
+
 
     RecyclerView recyclerView;
     List<Msg> msgList = new ArrayList<>();
@@ -57,14 +54,13 @@ public class MainActivity extends AppCompatActivity {
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         inputbox = (EditText) findViewById(R.id.inputbox);
-        send_bt = (Button) findViewById(R.id.send_bt);
+        send_bt = (ImageView) findViewById(R.id.send_bt);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         adapter = new MsgAdapter(msgList);
         recyclerView.setAdapter(adapter);
         type = Msg.TYPE_SENT;
-
 
         factory = new ConnectionFactory();
         factory.setHost("10.0.2.2");
@@ -143,14 +139,12 @@ public class MainActivity extends AppCompatActivity {
         Log.d("unpack handler", "start unpack");
         if (tmp.split(separato + "")[0].matches(String.valueOf(EnterActivity.time))) {
             Log.d("unpack handler", "msg from self");
-            //tmp = EnterActivity.your_name + " : " + tmp.split(separato + "")[2];
 
             tmp = tmp.split(separato+"")[2];
             Msg msg = new Msg(tmp,Msg.TYPE_SENT);
             msgList.add(msg);
         } else {
             Log.d("unpack handler", "msg from others");
-            //tmp = tmp.split(separato + "")[1] + " : " + tmp.split(separato + "")[2];
 
             tmp = tmp.split(separato+"")[2];
             Msg msg = new Msg(tmp,Msg.TYPE_RECEIVED);
@@ -166,5 +160,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
 }
 
