@@ -9,7 +9,7 @@ import java.util.concurrent.TimeoutException;
 public class MQConnector {
 
     public static MQConnector instance;
-    private String host = "192.168.2.100";
+    private String host = "likol.idv.tw";
     private String username = "506170101";
     private String password = "506170101";
     public ConnectionFactory factory;
