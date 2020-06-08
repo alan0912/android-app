@@ -1,9 +1,7 @@
 package com.example.myapplication;
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -58,7 +56,11 @@ public class MainActivity extends AppCompatActivity {
         MQConnectionHandler();
 
         recyclerView.setOnTouchListener((v, event) -> {
-            mInputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
+            if (mInputMethodManager.isActive())
+            {
+                mInputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
+            }
+
             return false;
         });
     }
@@ -70,9 +72,13 @@ public class MainActivity extends AppCompatActivity {
                 tmp = inputbox.getText().toString();
                 if(tmp.equals(""))return;
                 pack();
-                inputbox.setText("");
+
+                runOnUiThread(() -> {
+                    inputbox.setText("");
+                });
+
                 channel.basicPublish("MyExchange", "", null, tmp.getBytes(StandardCharsets.UTF_8));
-                System.out.println(" [x] Sent '" + tmp + "'");
+                //System.out.println(" [x] Sent '" + tmp + "'");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -94,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("recv handler", "start");
                     tmp = new String(delivery.getBody(), "UTF-8");
                     unpack();
-                    System.out.println(" [x] Received '" + tmp + "'");
+                    //System.out.println(" [x] Received '" + tmp + "'");
                 };
 
                 channel.basicConsume(queueName, true, deliverCallback, consumerTag -> {
