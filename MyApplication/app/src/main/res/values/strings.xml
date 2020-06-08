@@ -9,4 +9,6 @@
     <string name="accept">接受</string>
     <string name="guest">訪客</string>
     <string name="chat_input_tooltip">請輸入聊天內容...</string>
+    <string name="join_chat"> 加入了聊天室。</string>
+    <string name="leave_chat"> 離開了聊天室。</string>
 </resources>

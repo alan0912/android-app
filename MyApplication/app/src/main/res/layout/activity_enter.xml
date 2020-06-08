@@ -60,13 +60,12 @@
 
     <Button
         android:id="@+id/enter_bt"
+        style="@style/Widget.Shrine.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="Enter"
         android:paddingLeft="50dp"
         android:paddingRight="50dp"
-        android:text="@string/button_submit_label"
-        android:textColor="#ffffff"
-        app:backgroundTint="?attr/colorPrimaryDark" />
+        android:text="@string/button_submit_label" />
 
 </LinearLayout>
