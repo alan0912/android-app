@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -27,12 +26,11 @@ import bean.Msg;
 public class MainActivity extends AppCompatActivity {
     EditText inputbox;
     Button send_bt;
-    String tmp;
     Channel channel;
     RecyclerView recyclerView;
     List<Msg> msgList = new ArrayList<>();
     MsgAdapter adapter;
-    String tmp_name;
+    Connection connection;
 
     InputMethodManager mInputMethodManager;
     char separato = 127;
@@ -66,30 +64,44 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void Send(View view) {
+    @Override
+    protected void onDestroy() {
+        Log.d("CHAT", "client destroy");
+        messagePublish("/event:leave");
         new Thread(() -> {
             try {
-                /*send*/
-                tmp = inputbox.getText().toString();
-                if(tmp.equals(""))return;
-                pack();
+                connection.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }).start();
+        super.onDestroy();
+    }
 
-                runOnUiThread(() -> {
-                    inputbox.setText("");
-                });
-
-                channel.basicPublish("MyExchange", "", null, tmp.getBytes(StandardCharsets.UTF_8));
-                //System.out.println(" [x] Sent '" + tmp + "'");
+    public void messagePublish(String _msg)
+    {
+        new Thread(() -> {
+            if (_msg.length() < 1) return;
+            String msg = pack(_msg);
+            Log.d("CHAT", String.format("Send message: %s", msg));
+            try {
+                channel.basicPublish("MyExchange", "", null, msg.getBytes(StandardCharsets.UTF_8));
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }).start();
     }
 
+    public void onSendButtonClick(View view) {
+        messagePublish(inputbox.getText().toString());
+
+        inputbox.setText("");
+    }
+
     public void MQConnectionHandler() {
         new Thread(() -> {
             try {
-                Connection connection = MQConnector.getInstance().connectGenerator();
+                connection = MQConnector.getInstance().connectGenerator();
                 channel = connection.createChannel();
 
                 channel.exchangeDeclare("MyExchange", "fanout");
@@ -98,14 +110,18 @@ public class MainActivity extends AppCompatActivity {
                 channel.queueBind(queueName, "MyExchange", "");
 
                 DeliverCallback deliverCallback = (consumerTag, delivery) -> {
-                    Log.d("recv handler", "start");
-                    tmp = new String(delivery.getBody(), "UTF-8");
-                    unpack();
-                    //System.out.println(" [x] Received '" + tmp + "'");
+                    unpack(new String(delivery.getBody(), "UTF-8"));
+
+                    runOnUiThread(() -> {
+                        adapter.notifyItemInserted(msgList.size()-1);
+                        recyclerView.scrollToPosition(msgList.size() - 1);
+                    });
                 };
 
                 channel.basicConsume(queueName, true, deliverCallback, consumerTag -> {
                 });
+
+                this.messagePublish("/event:join");
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -119,32 +135,42 @@ public class MainActivity extends AppCompatActivity {
         EnterActivity.time = random_num + EnterActivity.time;
     }
 
-    public void pack() {
+    public String pack(String omg) {
         String random_time = String.valueOf(EnterActivity.time);
-        tmp = random_time + separato + EnterActivity.your_name + separato + tmp;
-
+        return random_time + separato + EnterActivity.your_name + separato + omg;
     }
 
-    public void unpack() {
-        Log.d("unpack handler", "start unpack");
-        if (tmp.split(separato + "")[0].matches(String.valueOf(EnterActivity.time))) {
-            Log.d("unpack handler", "msg from self");
-            tmp_name = (String) tmp.split(separato+"")[1];
-            tmp = tmp.split(separato+"")[2];
-            Msg msg = new Msg(tmp,Msg.TYPE_SENT,tmp_name);
-            msgList.add(msg);
-        } else {
-            Log.d("unpack handler", "msg from others");
-            tmp_name = (String) tmp.split(separato+"")[1];
-            tmp = tmp.split(separato+"")[2];
-            Msg msg = new Msg(tmp,Msg.TYPE_RECEIVED,tmp_name);
-            msgList.add(msg);
+    public void unpack(String omg) {
+        String id = omg.split(separato+"")[0];
+        String name = omg.split(separato+"")[1];
+        String message = omg.split(separato+"")[2];
+        Msg _msg;
+
+        Log.d("CHAT", String.format("Receive message: %s", omg));
+
+        if (message.equals("/event:join"))
+        {
+            _msg = new Msg(String.format("%s %s", name, getResources().getString(R.string.join_chat)), Msg.TYPE_EVENT, null);
+            msgList.add(_msg);
+            return;
         }
 
-        runOnUiThread(() -> {
-            adapter.notifyItemInserted(msgList.size()-1);
-            recyclerView.scrollToPosition(msgList.size() - 1);
-        });
+        if (message.equals("/event:leave"))
+        {
+            _msg = new Msg(String.format("%s %s", name, getResources().getString(R.string.leave_chat)), Msg.TYPE_EVENT, null);
+            msgList.add(_msg);
+            return;
+        }
+
+        if (id.equals(String.valueOf(EnterActivity.time)))
+        {
+            _msg = new Msg(message,Msg.TYPE_SENT,name);
+            msgList.add(_msg);
+            return;
+        }
+
+        _msg = new Msg(message,Msg.TYPE_RECEIVED,name);
+        msgList.add(_msg);
     }
 }
 
