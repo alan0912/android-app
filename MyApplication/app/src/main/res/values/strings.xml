@@ -3,4 +3,10 @@
     <string name="input_name_label">暱稱</string>
     <string name="button_submit_label">開始聊天</string>
     <string name="please_enter_name">請輸入暱稱</string>
+    <string name="no_nickname_box_title">沒有輸入暱稱</string>
+    <string name="no_nickname_box_message">是否由系統幫您產生一個呢？</string>
+    <string name="cancel">取消</string>
+    <string name="accept">接受</string>
+    <string name="guest">訪客</string>
+    <string name="chat_input_tooltip">請輸入聊天內容...</string>
 </resources>

@@ -6,10 +6,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
+
+import Likol.NameGenerator;
 
 public class EnterActivity extends AppCompatActivity {
 
@@ -31,8 +36,16 @@ public class EnterActivity extends AppCompatActivity {
 
     public void Enter(View view){
         if(name.getText().toString().matches("")){
-            Snackbar.make(view, R.string.please_enter_name, Snackbar.LENGTH_SHORT).show();
-
+            new MaterialAlertDialogBuilder(view.getContext())
+                    .setIcon(R.drawable.ic_warning_black_24dp)
+                    .setTitle(R.string.no_nickname_box_title)
+                    .setMessage(R.string.no_nickname_box_message)
+                    .setNegativeButton(R.string.cancel, null)
+                    .setPositiveButton(R.string.accept, (dialog, which) -> {
+                        NameGenerator ng = new NameGenerator(this);
+                        name.setText(ng.getName());
+                    })
+                    .show();
         }else{
             time = System.currentTimeMillis();
             your_name = name.getText().toString();
