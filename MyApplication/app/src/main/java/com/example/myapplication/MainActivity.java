@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
@@ -25,7 +26,7 @@ import bean.Msg;
 
 public class MainActivity extends AppCompatActivity {
     EditText inputbox;
-    ImageView send_bt;
+    Button send_bt;
     String tmp;
     Channel channel;
     RecyclerView recyclerView;

@@ -10,14 +10,32 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="#26252A" />
+        android:background="#26252A">
+
+    </androidx.recyclerview.widget.RecyclerView>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="70dp"
+        android:layout_height="60dp"
         android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/imageBtn"
+            style="@style/Widget.MaterialComponents.Button.TextButton.Icon"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="4"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:onClick="Send"
+            android:paddingLeft="10dp"
+            app:backgroundTint="#2c2b30"
+            app:cornerRadius="0dp"
+            app:icon="@drawable/ic_image"
+            app:iconGravity="textStart"
+            app:iconTint="@color/colorPrimaryDark" />
 
         <EditText
             android:id="@+id/inputbox"
@@ -26,24 +44,30 @@
             android:layout_weight="1"
             android:background="#2c2b30"
             android:ems="10"
-            android:hint=" Type your message here..."
+            android:hint="@string/chat_input_tooltip"
             android:inputType="textPersonName"
-            android:paddingLeft="15sp"
+            android:paddingLeft="5dp"
             android:textColor="#979696"
             android:textColorHint="#979696"
             android:textSize="16dp"
             android:textStyle="bold"
             android:typeface="monospace" />
 
-        <ImageView
+        <Button
             android:id="@+id/send_bt"
+            style="@style/Widget.MaterialComponents.Button.TextButton.Icon"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="6"
-            android:background="#2c2b30"
+            android:layout_weight="4"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
             android:onClick="Send"
-            android:padding="17dp"
-            app:srcCompat="@drawable/paper_plane" />
+            android:paddingLeft="10dp"
+            app:backgroundTint="#2c2b30"
+            app:cornerRadius="0dp"
+            app:icon="@drawable/paper_plane"
+            app:iconGravity="textStart"
+            app:iconTint="@color/colorPrimaryDark" />
 
     </LinearLayout>
 
