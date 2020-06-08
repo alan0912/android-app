@@ -23,6 +23,7 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.ViewHolder> {
         TextView rightMsg;
         TextView timeView_l;
         TextView timeView_r;
+        TextView name;
 
 
         public ViewHolder(View itemView) {
@@ -33,7 +34,7 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.ViewHolder> {
             rightMsg = (TextView) itemView.findViewById(R.id.right_msg);
             timeView_l = (TextView) itemView.findViewById(R.id.time_view_left);
             timeView_r = (TextView) itemView.findViewById(R.id.time_view_right);
-
+            name = (TextView) itemView.findViewById(R.id.name);
         }
     }
 
@@ -58,6 +59,7 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.ViewHolder> {
             holder.rightLayout.setVisibility(View.GONE);
             holder.leftMsg.setText(msg.getContent());
             holder.timeView_l.setText(msg.getMsgTime());
+            holder.name.setText(msg.getName());
         }else if (msg.getType() == Msg.TYPE_SENT){
 
             holder.rightLayout.setVisibility(View.VISIBLE);

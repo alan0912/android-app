@@ -13,11 +13,13 @@ public class Msg {
     private int type;
     private Calendar mCal;
     private String msg_time;
+    private String name;
 
-    public Msg(String content, int type) {
+    public Msg(String content, int type, String name) {
         this.content = content;
         this.type = type;
         this.msg_time = currentTime().toString();
+        this.name = name;
     }
 
     public Msg(String content) {
@@ -54,5 +56,8 @@ public class Msg {
             c_time = c_time.toString().replaceFirst(c_time.toString().split(":")[0]+":","");
             return "下午 " + c_time;
         }
+    }
+    public String getName(){
+        return name;
     }
 }

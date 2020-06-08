@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     List<Msg> msgList = new ArrayList<>();
     MsgAdapter adapter;
+    String tmp_name;
 
     InputMethodManager mInputMethodManager;
     char separato = 127;
@@ -53,7 +54,6 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
         adapter = new MsgAdapter(msgList);
         recyclerView.setAdapter(adapter);
-
         GetRandomId();
         MQConnectionHandler();
 
@@ -115,21 +115,22 @@ public class MainActivity extends AppCompatActivity {
     public void pack() {
         String random_time = String.valueOf(EnterActivity.time);
         tmp = random_time + separato + EnterActivity.your_name + separato + tmp;
+
     }
 
     public void unpack() {
         Log.d("unpack handler", "start unpack");
         if (tmp.split(separato + "")[0].matches(String.valueOf(EnterActivity.time))) {
             Log.d("unpack handler", "msg from self");
-
+            tmp_name = (String) tmp.split(separato+"")[1];
             tmp = tmp.split(separato+"")[2];
-            Msg msg = new Msg(tmp,Msg.TYPE_SENT);
+            Msg msg = new Msg(tmp,Msg.TYPE_SENT,tmp_name);
             msgList.add(msg);
         } else {
             Log.d("unpack handler", "msg from others");
-
+            tmp_name = (String) tmp.split(separato+"")[1];
             tmp = tmp.split(separato+"")[2];
-            Msg msg = new Msg(tmp,Msg.TYPE_RECEIVED);
+            Msg msg = new Msg(tmp,Msg.TYPE_RECEIVED,tmp_name);
             msgList.add(msg);
         }
 
