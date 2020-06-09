@@ -11,12 +11,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.DeliverCallback;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,11 +25,9 @@ import bean.Msg;
 public class MainActivity extends AppCompatActivity {
     EditText inputbox;
     Button send_bt;
-    Channel channel;
     RecyclerView recyclerView;
     List<Msg> msgList = new ArrayList<>();
     MsgAdapter adapter;
-    Connection connection;
 
     InputMethodManager mInputMethodManager;
     char separato = 127;
@@ -41,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_IMMERSIVE);
 
         mInputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
 
@@ -68,16 +63,13 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        Log.d("CHAT", "client destroy");
+        Log.d("CHAT", "on client destroy");
 
         Thread closeConnection = new Thread(() -> {
-            try {
-                messagePublish("/event:leave");
-                connection.close();
-                Log.d("CHAT", "Connection close!");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            messagePublish("/event:leave");
+            Log.d("TEST", "leave event send");
+            MQConnector.getInstance().disconnect();
+            Log.d("CHAT", "Connection close!");
         });
 
         closeConnection.start();
@@ -92,18 +84,25 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    public void messagePublish(String _msg)
-    {
-        new Thread(() -> {
+    public void messagePublish(String _msg) {
+        Thread thread = new Thread(() -> {
             if (_msg.length() < 1) return;
             String msg = pack(_msg);
             Log.d("CHAT", String.format("Send message: %s", msg));
             try {
-                channel.basicPublish("MyExchange", "", null, msg.getBytes(StandardCharsets.UTF_8));
+                MQConnector.getInstance().getChannel().basicPublish("MyExchange", "", null, msg.getBytes(StandardCharsets.UTF_8));
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }).start();
+        });
+
+        thread.start();
+
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public void onSendButtonClick(View view) {
@@ -115,30 +114,23 @@ public class MainActivity extends AppCompatActivity {
     public void MQConnectionHandler() {
         new Thread(() -> {
             try {
-                connection = MQConnector.getInstance().getConnection();
-                channel = connection.createChannel();
+                MQConnector.getInstance().getChannel().exchangeDeclare("MyExchange", "fanout");
 
-                channel.exchangeDeclare("MyExchange", "fanout");
-
-                String queueName = channel.queueDeclare().getQueue();
-                channel.queueBind(queueName, "MyExchange", "");
+                String queueName = MQConnector.getInstance().getChannel().queueDeclare().getQueue();
+                MQConnector.getInstance().getChannel().queueBind(queueName, "MyExchange", "");
 
                 DeliverCallback deliverCallback = (consumerTag, delivery) -> {
-
                     runOnUiThread(() -> {
-                        try {
-                            unpack(new String(delivery.getBody(), "UTF-8"));
-                        } catch (UnsupportedEncodingException e) {
-                            e.printStackTrace();
-                        }
+                        unpack(new String(delivery.getBody(), StandardCharsets.UTF_8));
                     });
 
                 };
 
-                channel.basicConsume(queueName, true, deliverCallback, consumerTag -> {
+                MQConnector.getInstance().getChannel().basicConsume(queueName, true, deliverCallback, consumerTag -> {
                 });
 
-                this.messagePublish("/event:join");
+                messagePublish("/event:join");
+                Log.d("THREAD", "MQConnectionHandler done!");
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -161,7 +153,6 @@ public class MainActivity extends AppCompatActivity {
         String id = omg.split(separato+"")[0];
         String name = omg.split(separato+"")[1];
         String message = omg.split(separato+"")[2];
-        Msg _msg;
 
         Log.d("CHAT", String.format("Receive message: %s", omg));
 

@@ -1,5 +1,6 @@
 package Likol;
 
+import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 
@@ -14,6 +15,7 @@ public class MQConnector {
     private String password = "506170101";
     private ConnectionFactory factory;
     private Connection connection;
+    private Channel channel;
 
     private MQConnector() {
         factory = new ConnectionFactory();
@@ -21,7 +23,13 @@ public class MQConnector {
         factory.setUsername(username);
         factory.setPassword(password);
 
-        connection = connectGenerator();
+        connection = getConnection();
+        try {
+            channel = connection.createChannel();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public static MQConnector getInstance()
@@ -40,6 +48,14 @@ public class MQConnector {
         }
     }
 
+    private Channel channelGenerator() {
+        try {
+            return connection.createChannel();
+        } catch (NullPointerException | IOException e) {
+            return null;
+        }
+    }
+
     public Connection getConnection() {
         if (connection == null || !connection.isOpen())
             connection = connectGenerator();
@@ -47,4 +63,28 @@ public class MQConnector {
         return connection;
     }
 
+    public Channel getChannel() {
+        if (!channel.isOpen())
+                channel = channelGenerator();
+        return channel;
+    }
+
+    public void disconnect() {
+        Thread thread = new Thread(() -> {
+            try {
+                connection.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+        thread.start();
+
+        try {
+            thread.join();
+        } catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }
+    }
 }
