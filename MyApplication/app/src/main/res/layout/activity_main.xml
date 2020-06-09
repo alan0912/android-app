@@ -29,7 +29,7 @@
             android:layout_weight="4"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:onClick="Send"
+            android:onClick="onImageButtonClick"
             android:paddingLeft="10dp"
             app:backgroundTint="#2c2b30"
             app:cornerRadius="0dp"

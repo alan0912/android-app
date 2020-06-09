@@ -173,5 +173,10 @@ public class MainActivity extends AppCompatActivity {
         _msg = new Msg(message,Msg.TYPE_RECEIVED,name);
         msgList.add(_msg);
     }
+
+    public void onImageButtonClick(View v)
+    {
+        return;
+    }
 }
 
