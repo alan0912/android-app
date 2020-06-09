@@ -16,6 +16,7 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.DeliverCallback;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -68,14 +69,26 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         Log.d("CHAT", "client destroy");
-        messagePublish("/event:leave");
-        new Thread(() -> {
+
+        Thread closeConnection = new Thread(() -> {
             try {
+                messagePublish("/event:leave");
                 connection.close();
+                Log.d("CHAT", "Connection close!");
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }).start();
+        });
+
+        closeConnection.start();
+
+        try {
+            closeConnection.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        Log.d("CHAT", "Start destroy");
         super.onDestroy();
     }
 
@@ -111,12 +124,15 @@ public class MainActivity extends AppCompatActivity {
                 channel.queueBind(queueName, "MyExchange", "");
 
                 DeliverCallback deliverCallback = (consumerTag, delivery) -> {
-                    unpack(new String(delivery.getBody(), "UTF-8"));
 
                     runOnUiThread(() -> {
-                        adapter.notifyItemInserted(msgList.size()-1);
-                        recyclerView.scrollToPosition(msgList.size() - 1);
+                        try {
+                            unpack(new String(delivery.getBody(), "UTF-8"));
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
                     });
+
                 };
 
                 channel.basicConsume(queueName, true, deliverCallback, consumerTag -> {
@@ -151,27 +167,30 @@ public class MainActivity extends AppCompatActivity {
 
         if (message.equals("/event:join"))
         {
-            _msg = new Msg(String.format("%s %s", name, getResources().getString(R.string.join_chat)), Msg.TYPE_EVENT, null);
-            msgList.add(_msg);
+            updateRecyclerView(new Msg(String.format("%s %s", name, getResources().getString(R.string.join_chat)), Msg.TYPE_EVENT, null));
             return;
         }
 
         if (message.equals("/event:leave"))
         {
-            _msg = new Msg(String.format("%s %s", name, getResources().getString(R.string.leave_chat)), Msg.TYPE_EVENT, null);
-            msgList.add(_msg);
+            updateRecyclerView(new Msg(String.format("%s %s", name, getResources().getString(R.string.leave_chat)), Msg.TYPE_EVENT, null));
             return;
         }
 
         if (id.equals(String.valueOf(EnterActivity.time)))
         {
-            _msg = new Msg(message,Msg.TYPE_SENT,name);
-            msgList.add(_msg);
+            updateRecyclerView(new Msg(message,Msg.TYPE_SENT,name));
             return;
         }
 
-        _msg = new Msg(message,Msg.TYPE_RECEIVED,name);
+        updateRecyclerView(new Msg(message,Msg.TYPE_RECEIVED,name));
+    }
+
+    public void updateRecyclerView(Msg _msg)
+    {
         msgList.add(_msg);
+        adapter.notifyItemInserted(msgList.size()-1);
+        recyclerView.scrollToPosition(msgList.size() - 1);
     }
 
     public void onImageButtonClick(View v)

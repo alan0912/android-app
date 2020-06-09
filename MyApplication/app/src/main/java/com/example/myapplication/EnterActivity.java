@@ -58,9 +58,7 @@ public class EnterActivity extends AppCompatActivity {
                     });
                 } else
                 {
-                    runOnUiThread(() -> {
-                        goToChatActivity();
-                    });
+                    runOnUiThread(this::goToChatActivity);
                 }
             });
 

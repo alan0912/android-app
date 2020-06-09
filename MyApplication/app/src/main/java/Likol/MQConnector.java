@@ -32,7 +32,7 @@ public class MQConnector {
         return instance;
     }
 
-    public Connection connectGenerator() {
+    private Connection connectGenerator() {
         try {
             return factory.newConnection();
         } catch (TimeoutException | IOException e) {
@@ -41,8 +41,9 @@ public class MQConnector {
     }
 
     public Connection getConnection() {
-        if (connection == null)
+        if (connection == null || !connection.isOpen())
             connection = connectGenerator();
+
         return connection;
     }
 
