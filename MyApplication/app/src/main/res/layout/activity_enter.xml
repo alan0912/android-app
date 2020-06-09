@@ -38,6 +38,10 @@
         android:hint="@string/input_name_label"
         android:textColorHint="#aaa"
         app:boxBackgroundColor="#26252a"
+        app:counterEnabled="true"
+        app:counterMaxLength="10"
+        app:counterTextColor="?android:attr/colorFocusedHighlight"
+        app:errorEnabled="true"
         app:startIconDrawable="@drawable/person_icon"
         app:startIconTint="#aaa">
 
@@ -46,9 +50,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="text"
-            android:textColor="#fff"
-            app:counterEnabled="true"
-            app:counterMaxLength="20" />
+            android:textColor="#fff" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <Space

@@ -33,7 +33,8 @@ public class EnterActivity extends AppCompatActivity {
     }
 
     public void Enter(View view){
-        if(name.getText().toString().matches("")){
+        String tmpName = name.getText().toString();
+        if(tmpName.matches("")){
             new MaterialAlertDialogBuilder(view.getContext())
                     .setIcon(R.drawable.ic_warning_black_24dp)
                     .setTitle(R.string.no_nickname_box_title)
@@ -44,9 +45,17 @@ public class EnterActivity extends AppCompatActivity {
                         name.setText(ng.getName());
                     })
                     .show();
-        }else{
+        }
+        else
+        {
+            if (tmpName.length() > 10)
+            {
+                Snackbar.make(view, R.string.name_too_long, Snackbar.LENGTH_SHORT).show();
+                return;
+            }
+
             time = System.currentTimeMillis();
-            your_name = name.getText().toString();
+            your_name = tmpName;
 
             Thread start_connecting = new Thread(() -> {
                 Connection connection = MQConnector.getInstance().getConnection();
@@ -63,8 +72,6 @@ public class EnterActivity extends AppCompatActivity {
             });
 
             start_connecting.start();
-
-
         }
     }
 
