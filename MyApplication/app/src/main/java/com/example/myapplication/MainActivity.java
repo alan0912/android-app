@@ -20,6 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import Likol.MQConnector;
 import adapter.MsgAdapter;
 import bean.Msg;
 
@@ -101,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
     public void MQConnectionHandler() {
         new Thread(() -> {
             try {
-                connection = MQConnector.getInstance().connectGenerator();
+                connection = MQConnector.getInstance().getConnection();
                 channel = connection.createChannel();
 
                 channel.exchangeDeclare("MyExchange", "fanout");

@@ -7,8 +7,11 @@ import android.view.View;
 import android.widget.Button;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
+import com.rabbitmq.client.Connection;
 
+import Likol.MQConnector;
 import Likol.NameGenerator;
 
 public class EnterActivity extends AppCompatActivity {
@@ -44,11 +47,34 @@ public class EnterActivity extends AppCompatActivity {
         }else{
             time = System.currentTimeMillis();
             your_name = name.getText().toString();
-            Intent intent = new Intent();
-            intent.setClass(EnterActivity.this , MainActivity.class);
-            startActivity(intent);
-        }
 
+            Thread start_connecting = new Thread(() -> {
+                Connection connection = MQConnector.getInstance().getConnection();
+
+                if (connection == null)
+                {
+                    runOnUiThread(() -> {
+                        Snackbar.make(view, R.string.connection_fail, Snackbar.LENGTH_SHORT).show();
+                    });
+                } else
+                {
+                    runOnUiThread(() -> {
+                        goToChatActivity();
+                    });
+                }
+            });
+
+            start_connecting.start();
+
+
+        }
+    }
+
+    public void goToChatActivity()
+    {
+        Intent intent = new Intent();
+        intent.setClass(EnterActivity.this , MainActivity.class);
+        startActivity(intent);
     }
 
 }
