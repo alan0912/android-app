@@ -1,8 +1,10 @@
 package adapter;
 
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
@@ -10,7 +12,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.myapplication.R;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
+import Likol.ImageMessageDecoder;
 import bean.Msg;
 public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.ViewHolder> {
     private List<Msg> mMsgList;
@@ -20,7 +24,9 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.ViewHolder> {
         LinearLayout leftLayout;
         LinearLayout rightLayout;
         TextView leftMsg;
+        ImageView leftImg;
         TextView rightMsg;
+        ImageView rightImg;
         TextView timeView_l;
         TextView timeView_r;
         TextView name;
@@ -39,6 +45,8 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.ViewHolder> {
             name = (TextView) itemView.findViewById(R.id.name);
             event_layout = itemView.findViewById(R.id.event_layout);
             event_view = itemView.findViewById(R.id.event);
+            leftImg = itemView.findViewById(R.id.left_img);
+            rightImg = itemView.findViewById(R.id.right_img);
         }
     }
 
@@ -57,18 +65,53 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         Msg msg = mMsgList.get(position);
+
+        String data = msg.getContent();
+        Bitmap bm = null;
+        if (data.startsWith("/event:image "))
+        {
+            data = data.replace("/event:image ", "");
+            try {
+                bm = new ImageMessageDecoder().execute(data).get();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
         if (msg.getType() == Msg.TYPE_RECEIVED){
             holder.event_layout.setVisibility(View.GONE);
             holder.leftLayout.setVisibility(View.VISIBLE);
             holder.rightLayout.setVisibility(View.GONE);
-            holder.leftMsg.setText(msg.getContent());
+
+            if (bm != null)
+            {
+                holder.leftImg.setImageBitmap(bm);
+                holder.leftImg.setVisibility(View.VISIBLE);
+                holder.leftMsg.setVisibility(View.GONE);
+            }
+            else
+            {
+                holder.leftMsg.setText(data);
+            }
+
             holder.timeView_l.setText(msg.getMsgTime());
             holder.name.setText(msg.getName());
         }else if (msg.getType() == Msg.TYPE_SENT){
             holder.event_layout.setVisibility(View.GONE);
             holder.rightLayout.setVisibility(View.VISIBLE);
             holder.leftLayout.setVisibility(View.GONE);
-            holder.rightMsg.setText(msg.getContent());
+            if (bm != null)
+            {
+                holder.rightImg.setImageBitmap(bm);
+                holder.rightImg.setVisibility(View.VISIBLE);
+                holder.rightMsg.setVisibility(View.GONE);
+            }
+            else
+            {
+                holder.rightMsg.setText(data);
+            }
             holder.timeView_r.setText(msg.getMsgTime());
         }
         // event view

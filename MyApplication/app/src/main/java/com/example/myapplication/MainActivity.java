@@ -1,5 +1,8 @@
 package com.example.myapplication;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -18,6 +21,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import Likol.BitmapProcessingAsyncTask;
 import Likol.MQConnector;
 import adapter.MsgAdapter;
 import bean.Msg;
@@ -31,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
 
     InputMethodManager mInputMethodManager;
     char separato = 127;
+
+    private static final int READ_REQUEST_CODE = 42;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,7 +136,6 @@ public class MainActivity extends AppCompatActivity {
                 });
 
                 messagePublish("/event:join");
-                Log.d("THREAD", "MQConnectionHandler done!");
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -186,7 +191,27 @@ public class MainActivity extends AppCompatActivity {
 
     public void onImageButtonClick(View v)
     {
-        return;
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("image/*");
+
+        startActivityForResult(intent, READ_REQUEST_CODE);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode,
+                                 Intent resultData) {
+
+        if (requestCode == READ_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            Uri uri = null;
+            if (resultData != null) {
+                uri = resultData.getData();
+                Log.i("onActivityResult", "Uri: " + uri.toString());
+                new BitmapProcessingAsyncTask(this).execute(uri);
+            }
+        }
+
+        super.onActivityResult(requestCode, resultCode, resultData);
     }
 }
 
