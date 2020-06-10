@@ -78,8 +78,6 @@ public class BitmapProcessingAsyncTask extends AsyncTask<Uri, Integer, String> {
     @Override
     protected void onPostExecute(String s)
     {
-
         activity.messagePublish("/event:image " + s);
-        Log.d(TAG, String.format("image base64 string: /image:%s", s));
     }
 }

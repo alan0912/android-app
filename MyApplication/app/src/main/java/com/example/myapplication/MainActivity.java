@@ -69,13 +69,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        Log.d("CHAT", "on client destroy");
 
         Thread closeConnection = new Thread(() -> {
             messagePublish("/event:leave");
-            Log.d("TEST", "leave event send");
             MQConnector.getInstance().disconnect();
-            Log.d("CHAT", "Connection close!");
         });
 
         closeConnection.start();
@@ -86,7 +83,6 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        Log.d("CHAT", "Start destroy");
         super.onDestroy();
     }
 
@@ -94,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
         Thread thread = new Thread(() -> {
             if (_msg.length() < 1) return;
             String msg = pack(_msg);
-            Log.d("CHAT", String.format("Send message: %s", msg));
+
             try {
                 MQConnector.getInstance().getChannel().basicPublish("MyExchange", "", null, msg.getBytes(StandardCharsets.UTF_8));
             } catch (IOException e) {
@@ -159,8 +155,6 @@ public class MainActivity extends AppCompatActivity {
         String name = omg.split(separato+"")[1];
         String message = omg.split(separato+"")[2];
 
-        Log.d("CHAT", String.format("Receive message: %s", omg));
-
         if (message.equals("/event:join"))
         {
             updateRecyclerView(new Msg(String.format("%s %s", name, getResources().getString(R.string.join_chat)), Msg.TYPE_EVENT, null));
@@ -206,7 +200,6 @@ public class MainActivity extends AppCompatActivity {
             Uri uri = null;
             if (resultData != null) {
                 uri = resultData.getData();
-                Log.i("onActivityResult", "Uri: " + uri.toString());
                 new BitmapProcessingAsyncTask(this).execute(uri);
             }
         }
