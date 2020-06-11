@@ -3,12 +3,17 @@ package com.example.myapplication;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.View;
 
 import com.github.chrisbanes.photoview.PhotoView;
+
+import java.util.concurrent.ExecutionException;
+
+import Likol.ImageMessageDecoder;
 
 
 public class SimplePhotoActivity extends AppCompatActivity {
@@ -33,9 +38,18 @@ public class SimplePhotoActivity extends AppCompatActivity {
 
         mPhotoView = findViewById(R.id.iv_photo);
 
-        byte[] bytes = getIntent().getByteArrayExtra("image");
-        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-        mPhotoView.setImageBitmap(bitmap);
+        SharedPreferences preferences = getSharedPreferences("image_view", MODE_PRIVATE);
+        String base64_string = preferences.getString("image", null);
+
+        Bitmap bitmap = null;
+        try {
+            bitmap = new ImageMessageDecoder().execute(base64_string).get();
+            mPhotoView.setImageBitmap(bitmap);
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
     }
 }

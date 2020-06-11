@@ -23,11 +23,20 @@ public class BitmapProcessingAsyncTask extends AsyncTask<Uri, Integer, String> {
     private MainActivity activity;
     private final String TAG = "BitmapProcessingAsyncTask";
     private Uri fileUri;
+    private boolean shouldPublish;
 
     public BitmapProcessingAsyncTask(Context context)
     {
         this.context = context;
         this.activity = (MainActivity)context;
+        this.shouldPublish = true;
+    }
+
+    public BitmapProcessingAsyncTask(Context context, boolean shouldPublish)
+    {
+        this.context = context;
+        this.activity = (MainActivity)context;
+        this.shouldPublish = shouldPublish;
     }
 
     @Override
@@ -40,7 +49,7 @@ public class BitmapProcessingAsyncTask extends AsyncTask<Uri, Integer, String> {
             Log.d(TAG, String.format("file size: %d bytes", image.getByteCount()));
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
-            image.compress(Bitmap.CompressFormat.JPEG, 80, out);
+            image.compress(Bitmap.CompressFormat.JPEG, 90, out);
             Log.d(TAG, String.format("JPEG compress size: %d bytes", out.size()));
             image_base64 = Base64.getUrlEncoder().encodeToString(out.toByteArray());
         } catch (IOException e) {
@@ -73,8 +82,8 @@ public class BitmapProcessingAsyncTask extends AsyncTask<Uri, Integer, String> {
     private Bitmap getBitmapFromUri() throws IOException {
         Bitmap image = BitmapFactory.decodeFileDescriptor(getFileDescriptor());
 
-        int MAX_FILE_SIZE = 204800;
-        if (image.getByteCount() > MAX_FILE_SIZE)
+        // 如果最大邊超過 1024 px 則 resize 至新的大小
+        if (Math.max(image.getWidth(), image.getHeight()) >  1024)
             image = scaleDown(image, true);
 
         return rotateImage(image);
@@ -107,6 +116,7 @@ public class BitmapProcessingAsyncTask extends AsyncTask<Uri, Integer, String> {
     @Override
     protected void onPostExecute(String s)
     {
-        activity.messagePublish("/event:image " + s);
+        if (this.shouldPublish)
+            activity.messagePublish("/event:image " + s);
     }
 }

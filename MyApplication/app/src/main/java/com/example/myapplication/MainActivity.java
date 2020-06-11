@@ -2,10 +2,8 @@ package com.example.myapplication;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.content.SharedPreferences;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -28,7 +26,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import Likol.BitmapProcessingAsyncTask;
-import Likol.DrawableDecodeToBitmap;
+import Likol.DrawableEncodeToString;
 import Likol.MQConnector;
 import adapter.MsgAdapter;
 import bean.Msg;
@@ -229,11 +227,10 @@ public class MainActivity extends AppCompatActivity {
         ImageView imageView = (ImageView)view;
 
         try {
-            byte[] image_bytes = new DrawableDecodeToBitmap().execute((BitmapDrawable)imageView.getDrawable()).get();
-            Intent intent = new Intent(this, SimplePhotoActivity.class);
-            intent.putExtra("image", image_bytes);
-            startActivity(intent);
-
+            String base64_string = new DrawableEncodeToString(this).execute((BitmapDrawable)imageView.getDrawable()).get();
+            SharedPreferences preferences = getSharedPreferences("image_view", MODE_PRIVATE);
+            preferences.edit().putString("image", base64_string).apply();
+            startActivity(new Intent(this, SimplePhotoActivity.class));
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
