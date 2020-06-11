@@ -2,6 +2,10 @@ package com.example.myapplication;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,6 +13,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -20,8 +25,10 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import Likol.BitmapProcessingAsyncTask;
+import Likol.DrawableDecodeToBitmap;
 import Likol.MQConnector;
 import adapter.MsgAdapter;
 import bean.Msg;
@@ -37,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
     char separato = 127;
 
     private static final int READ_REQUEST_CODE = 42;
+    private static final int WRITE_REQUEST_CODE = 43;
+    private final String TAG = "Main";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -204,7 +213,39 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        if (requestCode == WRITE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            Uri uri = null;
+            if (resultData != null) {
+                uri = resultData.getData();
+                new BitmapProcessingAsyncTask(this).execute(uri);
+            }
+        }
+
         super.onActivityResult(requestCode, resultCode, resultData);
+    }
+
+    public void onImageViewClick(View view)
+    {
+        ImageView imageView = (ImageView)view;
+
+        try {
+            byte[] image_bytes = new DrawableDecodeToBitmap().execute((BitmapDrawable)imageView.getDrawable()).get();
+            Intent intent = new Intent(this, SimplePhotoActivity.class);
+            intent.putExtra("image", image_bytes);
+            startActivity(intent);
+
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void createTempFile(String mimeType, String fileName)
+    {
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType(mimeType);
+        intent.putExtra(Intent.EXTRA_TITLE, fileName);
+        startActivityForResult(intent, WRITE_REQUEST_CODE);
     }
 }
 

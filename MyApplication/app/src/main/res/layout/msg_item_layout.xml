@@ -49,6 +49,7 @@
                     android:layout_height="wrap_content"
                     android:adjustViewBounds="true"
                     android:maxWidth="240dp"
+                    android:onClick="onImageViewClick"
                     android:padding="15dp"
                     android:scaleType="centerInside"
                     android:visibility="gone" />
@@ -134,6 +135,7 @@
                     android:layout_height="wrap_content"
                     android:adjustViewBounds="true"
                     android:maxWidth="240dp"
+                    android:onClick="onImageViewClick"
                     android:padding="15dp"
                     android:scaleType="centerInside"
                     android:visibility="gone" />
